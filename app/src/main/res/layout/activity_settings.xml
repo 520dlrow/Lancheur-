@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Theme"
+            android:text="Theme & Colors"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp" />
 
@@ -44,53 +44,68 @@
             android:id="@+id/radioGroupTheme"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="16dp"
             android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/radioLight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Light" />
-
-            <RadioButton
-                android:id="@+id/radioDark"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dark" />
-
-            <RadioButton
-                android:id="@+id/radioWarm"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Warm" />
+            <RadioButton android:id="@+id/radioLight" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Light" />
+            <RadioButton android:id="@+id/radioDark" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Dark" />
+            <RadioButton android:id="@+id/radioWarm" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Warm" />
         </RadioGroup>
+
+        <CheckBox
+            android:id="@+id/cbDynamicColors"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Material You Dynamic Colors"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Scroll Mode"
+            android:text="Layout & Behavior"
             android:textColor="?android:attr/textColorPrimary"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:layout_marginTop="16dp" />
+
+        <CheckBox
+            android:id="@+id/cbEasyMode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Easy Mode (Senior 2x2 Grid)" />
+
+        <CheckBox
+            android:id="@+id/cbShowDock"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Show Bottom Dock" />
 
         <RadioGroup
             android:id="@+id/radioGroupScroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal">
+
+            <RadioButton android:id="@+id/radioVertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Vertical" />
+            <RadioButton android:id="@+id/radioHorizontal" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Horizontal" />
+        </RadioGroup>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="App Sorting"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="18sp" />
+
+        <RadioGroup
+            android:id="@+id/radioGroupSort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             android:orientation="horizontal">
 
-            <RadioButton
-                android:id="@+id/radioVertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Vertical" />
-
-            <RadioButton
-                android:id="@+id/radioHorizontal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Horizontal" />
+            <RadioButton android:id="@+id/radioSortName" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Name" />
+            <RadioButton android:id="@+id/radioSortPackage" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Package" />
         </RadioGroup>
 
         <TextView
@@ -113,7 +128,7 @@
             android:id="@+id/btnHiddenApps"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:text="Manage Hidden Apps" />
+            android:text="Manage Hidden Apps (Secure)" />
 
     </LinearLayout>
 </ScrollView>
