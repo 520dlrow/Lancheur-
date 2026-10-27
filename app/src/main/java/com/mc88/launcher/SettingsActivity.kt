@@ -1,6 +1,5 @@
 package com.mc88.launcher
 
-import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.hardware.camera2.CameraManager
@@ -55,11 +54,7 @@ class SettingsActivity : AppCompatActivity() {
             try {
                 isFlashOn = !isFlashOn
                 cameraManager.setTorchMode(cameraId, isFlashOn)
-                if (isFlashOn) {
-                    btnFlashlight.text = "Turn Off Flashlight"
-                } else {
-                    btnFlashlight.text = "Turn On Flashlight"
-                }
+                btnFlashlight.text = if (isFlashOn) "Turn Off Flashlight" else "Turn On Flashlight"
             } catch (e: Exception) {
                 Toast.makeText(this, "Flashlight not available", Toast.LENGTH_SHORT).show()
             }
@@ -108,42 +103,9 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         btnHiddenApps.setOnClickListener {
-            showSecurityPrompt()
+            startActivity(Intent(this, HiddenAppsActivity::class.java))
         }
         
         btnBack.setOnClickListener { finish() }
-    }
-
-    private fun showSecurityPrompt() {
-        val prefs = getSharedPreferences("launcher_prefs", MODE_PRIVATE)
-        val savedPin = prefs.getString("secure_pin", "")
-
-        if (savedPin.isNullOrEmpty()) {
-            val input = EditText(this)
-            input.hint = "Set a new PIN"
-            AlertDialog.Builder(this)
-                .setTitle("Setup PIN")
-                .setView(input)
-                .setPositiveButton("Save") { _, _ ->
-                    prefs.edit().putString("secure_pin", input.text.toString()).apply()
-                    Toast.makeText(this, "PIN Saved", Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this, HiddenAppsActivity::class.java))
-                }
-                .show()
-        } else {
-            val input = EditText(this)
-            input.hint = "Enter PIN"
-            AlertDialog.Builder(this)
-                .setTitle("Secure Area")
-                .setView(input)
-                .setPositiveButton("Unlock") { _, _ ->
-                    if (input.text.toString() == savedPin) {
-                        startActivity(Intent(this, HiddenAppsActivity::class.java))
-                    } else {
-                        Toast.makeText(this, "Incorrect PIN", Toast.LENGTH_SHORT).show()
-                    }
-                }
-                .show()
-        }
     }
 }
