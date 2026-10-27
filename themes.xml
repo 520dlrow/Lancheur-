@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <style name="Theme.MC88Launcher" parent="Theme.Material3.Light.NoActionBar">
+        <item name="android:windowBackground">@color/light_background</item>
+        <item name="android:textColorPrimary">@color/light_text</item>
+        <item name="colorPrimary">@color/light_text</item>
+    </style>
+
+    <style name="Theme.MC88Launcher.Dark" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/dark_background</item>
+        <item name="android:textColorPrimary">@color/dark_text</item>
+        <item name="colorPrimary">@color/dark_text</item>
+    </style>
+
+    <style name="Theme.MC88Launcher.Warm" parent="Theme.Material3.Dark.NoActionBar">
+        <item name="android:windowBackground">@color/warm_background</item>
+        <item name="android:textColorPrimary">@color/warm_text</item>
+        <item name="colorPrimary">@color/warm_text</item>
+    </style>
+</resources>
