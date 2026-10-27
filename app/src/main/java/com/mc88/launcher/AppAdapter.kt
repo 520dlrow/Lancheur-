@@ -9,15 +9,26 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class AppAdapter(
-    private val apps: List<AppInfo>,
+    private val originalList: List<AppInfo>,
     private val isHorizontal: Boolean,
+    private val isEasyMode: Boolean,
     private val onClick: (AppInfo) -> Unit
 ) : RecyclerView.Adapter<AppAdapter.ViewHolder>() {
 
+    private var filteredList = originalList
     private var iconSize = 48
 
     fun setIconSize(size: Int) {
-        iconSize = size
+        iconSize = if (isEasyMode) size * 2 else size
+        notifyDataSetChanged()
+    }
+
+    fun filter(query: String) {
+        filteredList = if (query.isEmpty()) {
+            originalList
+        } else {
+            originalList.filter { it.name.contains(query, ignoreCase = true) }
+        }
         notifyDataSetChanged()
     }
 
@@ -33,17 +44,17 @@ class AppAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val app = apps[position]
+        val app = filteredList[position]
         holder.tvAppName.text = app.name
         holder.ivAppIcon.setImageDrawable(app.icon)
         
-        if (isHorizontal) {
+        if (isHorizontal || isEasyMode) {
             holder.root.orientation = LinearLayout.VERTICAL
-            holder.tvAppName.setPadding(0, 12, 0, 0)
-            holder.root.minimumWidth = 100
+            holder.tvAppName.setPadding(0, 16, 0, 0)
+            holder.root.minimumWidth = 120
         } else {
             holder.root.orientation = LinearLayout.HORIZONTAL
-            holder.tvAppName.setPadding(16, 0, 0, 0)
+            holder.tvAppName.setPadding(20, 0, 0, 0)
             holder.root.minimumWidth = 0
         }
         
@@ -55,5 +66,5 @@ class AppAdapter(
         holder.itemView.setOnClickListener { onClick(app) }
     }
 
-    override fun getItemCount() = apps.size
+    override fun getItemCount() = filteredList.size
 }
