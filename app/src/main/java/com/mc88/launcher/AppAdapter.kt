@@ -1,12 +1,16 @@
 package com.mc88.launcher
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.mc88.launcher.databinding.ItemAppBinding
 
 class AppAdapter(
     private val apps: List<AppInfo>,
+    private val isHorizontal: Boolean,
     private val onClick: (AppInfo) -> Unit
 ) : RecyclerView.Adapter<AppAdapter.ViewHolder>() {
 
@@ -17,23 +21,38 @@ class AppAdapter(
         notifyDataSetChanged()
     }
 
-    class ViewHolder(val binding: ItemAppBinding) : RecyclerView.ViewHolder(binding.root)
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val root: LinearLayout = view.findViewById(R.id.itemRoot)
+        val ivAppIcon: ImageView = view.findViewById(R.id.ivAppIcon)
+        val tvAppName: TextView = view.findViewById(R.id.tvAppName)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(ItemAppBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_app, parent, false)
+        return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val app = apps[position]
-        holder.binding.tvAppName.text = app.name
-        holder.binding.ivAppIcon.setImageDrawable(app.icon)
+        holder.tvAppName.text = app.name
+        holder.ivAppIcon.setImageDrawable(app.icon)
         
-        val params = holder.binding.ivAppIcon.layoutParams
-        params.width = iconSize * 2
-        params.height = iconSize * 2
-        holder.binding.ivAppIcon.layoutParams = params
+        if (isHorizontal) {
+            holder.root.orientation = LinearLayout.VERTICAL
+            holder.tvAppName.setPadding(0, 12, 0, 0)
+            holder.root.minimumWidth = 100
+        } else {
+            holder.root.orientation = LinearLayout.HORIZONTAL
+            holder.tvAppName.setPadding(16, 0, 0, 0)
+            holder.root.minimumWidth = 0
+        }
         
-        holder.binding.root.setOnClickListener { onClick(app) }
+        val params = holder.ivAppIcon.layoutParams
+        params.width = iconSize
+        params.height = iconSize
+        holder.ivAppIcon.layoutParams = params
+        
+        holder.itemView.setOnClickListener { onClick(app) }
     }
 
     override fun getItemCount() = apps.size
