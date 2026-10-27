@@ -15,20 +15,10 @@ class AppAdapter(
     private val onClick: (AppInfo) -> Unit
 ) : RecyclerView.Adapter<AppAdapter.ViewHolder>() {
 
-    private var filteredList = originalList
     private var iconSize = 48
 
     fun setIconSize(size: Int) {
         iconSize = if (isEasyMode) size * 2 else size
-        notifyDataSetChanged()
-    }
-
-    fun filter(query: String) {
-        filteredList = if (query.isEmpty()) {
-            originalList
-        } else {
-            originalList.filter { it.name.contains(query, ignoreCase = true) }
-        }
         notifyDataSetChanged()
     }
 
@@ -44,7 +34,7 @@ class AppAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val app = filteredList[position]
+        val app = originalList[position]
         holder.tvAppName.text = app.name
         holder.ivAppIcon.setImageDrawable(app.icon)
         
@@ -66,5 +56,5 @@ class AppAdapter(
         holder.itemView.setOnClickListener { onClick(app) }
     }
 
-    override fun getItemCount() = filteredList.size
+    override fun getItemCount() = originalList.size
 }
