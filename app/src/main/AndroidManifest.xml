@@ -9,7 +9,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher_placeholder"
+        android:icon="@drawable/app_logo"
         android:label="MC88 Launcher"
         android:supportsRtl="true"
         android:theme="@style/Theme.MC88Launcher">
