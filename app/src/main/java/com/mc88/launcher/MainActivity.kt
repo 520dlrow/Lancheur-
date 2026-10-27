@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -36,20 +37,34 @@ class MainActivity : AppCompatActivity() {
         
         setContentView(R.layout.activity_main)
 
+        val setupLayout = findViewById<View>(R.id.setupLayout)
         val mainLayout = findViewById<View>(R.id.mainLayout)
+        val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
         val btnSettings = findViewById<ImageButton>(R.id.btnSettings)
         val tvTimeBattery = findViewById<TextView>(R.id.tvTimeBattery)
         
         recyclerView = findViewById(R.id.recyclerView)
 
-        mainLayout.visibility = View.VISIBLE
         updateHeaderTime(tvTimeBattery)
+
+        if (!prefs.getBoolean("setup_complete", false)) {
+            setupLayout.visibility = View.VISIBLE
+            mainLayout.visibility = View.GONE
+            btnGetStarted.setOnClickListener {
+                prefs.edit().putBoolean("setup_complete", true).apply()
+                setupLayout.visibility = View.GONE
+                mainLayout.visibility = View.VISIBLE
+                loadApps()
+            }
+        } else {
+            setupLayout.visibility = View.GONE
+            mainLayout.visibility = View.VISIBLE
+            loadApps()
+        }
 
         btnSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
-
-        loadApps()
     }
 
     private fun updateHeaderTime(tvTimeBattery: TextView) {
@@ -96,7 +111,7 @@ class MainActivity : AppCompatActivity() {
         } else if (scrollMode == "horizontal") {
             recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         } else {
-            recyclerView.layoutManager = GridLayoutManager(this, 4)
+            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         }
         
         recyclerView.adapter = adapter
