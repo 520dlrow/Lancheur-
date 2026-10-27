@@ -9,47 +9,10 @@
         android:layout_height="match_parent"
         android:background="@drawable/bg_gradient" />
 
-    <LinearLayout
-        android:id="@+id/setupLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:padding="32dp"
-        android:visibility="gone">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="32dp"
-            android:gravity="center"
-            android:text="Experience a simple, beautiful, and highly customizable launcher."
-            android:textColor="#E0E0E0"
-            android:textSize="16sp" />
-
-        <Button
-            android:id="@+id/btnGetStarted"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="Get Started"
-            android:backgroundTint="#FFFFFF"
-            android:textColor="#121418" />
-    </LinearLayout>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
+        android:layout_height="match_parent">
 
         <TextView
             android:id="@+id/tvGreeting"
@@ -74,7 +37,6 @@
             android:text="9:30  •  MON 15 MAR  •  74%"
             android:textColor="#D0D0D0"
             android:textSize="12sp"
-            android:letterSpacing="0.05"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tvGreeting" />
 
@@ -90,19 +52,84 @@
             app:layout_constraintTop_toTopOf="parent"
             app:tint="#FFFFFF" />
 
+        <EditText
+            android:id="@+id/searchBar"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="24dp"
+            android:background="@drawable/bg_search"
+            android:hint="Search apps..."
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#A0A0A0"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tvDateInfo" />
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="16dp"
             android:clipToPadding="false"
-            android:paddingStart="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="32dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:paddingBottom="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/bottomDock"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvDateInfo" />
+            app:layout_constraintTop_toBottomOf="@+id/searchBar" />
+
+        <LinearLayout
+            android:id="@+id/bottomDock"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/bg_search"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <ImageView
+                android:id="@+id/dockPhone"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_menu_call"
+                app:tint="#FFFFFF" />
+
+            <ImageView
+                android:id="@+id/dockBrowser"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_menu_compass"
+                app:tint="#FFFFFF" />
+
+            <ImageView
+                android:id="@+id/dockCamera"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_menu_camera"
+                app:tint="#FFFFFF" />
+
+            <ImageView
+                android:id="@+id/dockMessages"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:src="@android:drawable/ic_menu_send"
+                app:tint="#FFFFFF" />
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -110,11 +137,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:layout_marginBottom="16dp"
-        android:alpha="0.6"
+        android:layout_marginBottom="8dp"
+        android:alpha="0.4"
         android:text="COPYRIGHT: MC88"
         android:textColor="#FFFFFF"
-        android:textSize="10sp"
-        android:textStyle="bold" />
+        android:textSize="10sp" />
 
 </FrameLayout>
