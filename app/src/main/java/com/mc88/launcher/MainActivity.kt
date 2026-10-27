@@ -3,14 +3,18 @@ package com.mc88.launcher
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mc88.launcher.databinding.ActivityMainBinding
+import androidx.recyclerview.widget.RecyclerView
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityMainBinding
     private lateinit var adapter: AppAdapter
     private val appList = mutableListOf<AppInfo>()
 
@@ -22,30 +26,59 @@ class MainActivity : AppCompatActivity() {
             else -> setTheme(R.style.Theme_MC88Launcher)
         }
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContentView(R.layout.activity_main)
+
+        val setupLayout = findViewById<View>(R.id.setupLayout)
+        val mainLayout = findViewById<View>(R.id.mainLayout)
+        val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
+        val btnSettings = findViewById<ImageButton>(R.id.btnSettings)
+        val tvGreeting = findViewById<TextView>(R.id.tvGreeting)
+        val tvDateInfo = findViewById<TextView>(R.id.tvDateInfo)
+
+        updateHeaderTime(tvGreeting, tvDateInfo)
 
         if (!prefs.getBoolean("setup_complete", false)) {
-            binding.setupLayout.visibility = View.VISIBLE
-            binding.mainLayout.visibility = View.GONE
-            binding.btnGetStarted.setOnClickListener {
+            setupLayout.visibility = View.VISIBLE
+            mainLayout.visibility = View.GONE
+            btnGetStarted.setOnClickListener {
                 prefs.edit().putBoolean("setup_complete", true).apply()
-                binding.setupLayout.visibility = View.GONE
-                binding.mainLayout.visibility = View.VISIBLE
+                setupLayout.visibility = View.GONE
+                mainLayout.visibility = View.VISIBLE
                 loadApps()
             }
         } else {
-            binding.setupLayout.visibility = View.GONE
-            binding.mainLayout.visibility = View.VISIBLE
+            setupLayout.visibility = View.GONE
+            mainLayout.visibility = View.VISIBLE
             loadApps()
         }
 
-        binding.btnSettings.setOnClickListener {
+        btnSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
     }
 
+    private fun updateHeaderTime(tvGreeting: TextView, tvDateInfo: TextView) {
+        val now = Date()
+        val dayFormat = SimpleDateFormat("EEE.", Locale.ENGLISH)
+        val timeFormat = SimpleDateFormat("h:mm", Locale.ENGLISH)
+        val dateFormat = SimpleDateFormat("EEE d MMM", Locale.ENGLISH)
+        
+        tvGreeting.text = dayFormat.format(now).replace(".", ".")
+        
+        val batteryLevel = getBatteryLevel()
+        val timeStr = timeFormat.format(now).uppercase()
+        val dateStr = dateFormat.format(now).uppercase()
+        
+        tvDateInfo.text = "$timeStr  •  $dateStr  •  $batteryLevel%"
+    }
+
+    private fun getBatteryLevel(): Int {
+        val batteryManager = getSystemService(BATTERY_SERVICE) as android.os.BatteryManager
+        return batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+    }
+
     private fun loadApps() {
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
         val pm = packageManager
         val intent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
         val resolveInfos = pm.queryIntentActivities(intent, 0)
@@ -62,17 +95,17 @@ class MainActivity : AppCompatActivity() {
         }
         appList.sortBy { it.name }
 
-        adapter = AppAdapter(appList) { app ->
+        adapter = AppAdapter(appList, scrollMode == "horizontal") { app ->
             packageManager.getLaunchIntentForPackage(app.packageName)?.let { startActivity(it) }
         }
         
-        binding.recyclerView.layoutManager = if (scrollMode == "horizontal") {
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        if (scrollMode == "horizontal") {
+            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         } else {
-            GridLayoutManager(this, 4)
+            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         }
         
-        binding.recyclerView.adapter = adapter
+        recyclerView.adapter = adapter
         adapter.setIconSize(prefs.getInt("icon_size", 48))
     }
 
@@ -80,6 +113,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         if (getSharedPreferences("launcher_prefs", MODE_PRIVATE).getBoolean("setup_complete", false)) {
             loadApps()
+            updateHeaderTime(findViewById(R.id.tvGreeting), findViewById(R.id.tvDateInfo))
         }
     }
 }
