@@ -36,7 +36,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Theme & Colors"
+            android:text="Theme and Colors"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp" />
 
@@ -62,7 +62,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Layout & Behavior"
+            android:text="Layout and Behavior"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="18sp"
             android:layout_marginTop="16dp" />
