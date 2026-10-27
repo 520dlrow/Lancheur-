@@ -2,13 +2,21 @@ package com.mc88.launcher
 
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
-import android.widget.Button
+import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -17,6 +25,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var adapter: AppAdapter
     private val appList = mutableListOf<AppInfo>()
+    private lateinit var recyclerView: RecyclerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val prefs = getSharedPreferences("launcher_prefs", MODE_PRIVATE)
@@ -28,33 +37,39 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val setupLayout = findViewById<View>(R.id.setupLayout)
         val mainLayout = findViewById<View>(R.id.mainLayout)
-        val btnGetStarted = findViewById<Button>(R.id.btnGetStarted)
         val btnSettings = findViewById<ImageButton>(R.id.btnSettings)
         val tvGreeting = findViewById<TextView>(R.id.tvGreeting)
         val tvDateInfo = findViewById<TextView>(R.id.tvDateInfo)
+        val searchBar = findViewById<EditText>(R.id.searchBar)
+        val bottomDock = findViewById<LinearLayout>(R.id.bottomDock)
+        
+        recyclerView = findViewById(R.id.recyclerView)
 
+        mainLayout.visibility = View.VISIBLE
         updateHeaderTime(tvGreeting, tvDateInfo)
 
-        if (!prefs.getBoolean("setup_complete", false)) {
-            setupLayout.visibility = View.VISIBLE
-            mainLayout.visibility = View.GONE
-            btnGetStarted.setOnClickListener {
-                prefs.edit().putBoolean("setup_complete", true).apply()
-                setupLayout.visibility = View.GONE
-                mainLayout.visibility = View.VISIBLE
-                loadApps()
-            }
+        if (prefs.getBoolean("show_dock", true)) {
+            bottomDock.visibility = View.VISIBLE
         } else {
-            setupLayout.visibility = View.GONE
-            mainLayout.visibility = View.VISIBLE
-            loadApps()
+            bottomDock.visibility = View.GONE
         }
 
         btnSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
+
+        searchBar.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (::adapter.isInitialized) {
+                    adapter.filter(s.toString())
+                }
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        loadApps()
     }
 
     private fun updateHeaderTime(tvGreeting: TextView, tvDateInfo: TextView) {
@@ -63,57 +78,61 @@ class MainActivity : AppCompatActivity() {
         val timeFormat = SimpleDateFormat("h:mm", Locale.ENGLISH)
         val dateFormat = SimpleDateFormat("EEE d MMM", Locale.ENGLISH)
         
-        tvGreeting.text = dayFormat.format(now).replace(".", ".")
+        tvGreeting.text = dayFormat.format(now)
         
-        val batteryLevel = getBatteryLevel()
-        val timeStr = timeFormat.format(now).uppercase()
-        val dateStr = dateFormat.format(now).uppercase()
-        
-        tvDateInfo.text = "$timeStr  •  $dateStr  •  $batteryLevel%"
-    }
-
-    private fun getBatteryLevel(): Int {
         val batteryManager = getSystemService(BATTERY_SERVICE) as android.os.BatteryManager
-        return batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        val batteryLevel = batteryManager.getIntProperty(android.os.BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        
+        tvDateInfo.text = "${timeFormat.format(now).uppercase()}  •  ${dateFormat.format(now).uppercase()}  •  $batteryLevel%"
     }
 
     private fun loadApps() {
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
-        val pm = packageManager
-        val intent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
-        val resolveInfos = pm.queryIntentActivities(intent, 0)
-        
-        val hiddenPrefs = getSharedPreferences("hidden_apps", MODE_PRIVATE)
         val prefs = getSharedPreferences("launcher_prefs", MODE_PRIVATE)
-        val scrollMode = prefs.getString("scroll_mode", "vertical")
+        val scrollMode = prefs.getString("scroll_mode", "vertical") ?: "vertical"
+        val isEasyMode = prefs.getBoolean("easy_mode", false)
+        val sortOrder = prefs.getString("sort_order", "name") ?: "name"
+        val iconSize = prefs.getInt("icon_size", 48)
+        val hiddenPrefs = getSharedPreferences("hidden_apps", MODE_PRIVATE)
+        val pm = packageManager
 
-        appList.clear()
-        for (info in resolveInfos) {
-            val pkg = info.activityInfo.packageName
-            if (pkg == packageName || hiddenPrefs.getBoolean(pkg, false)) continue
-            appList.add(AppInfo(info.loadLabel(pm).toString(), info.loadIcon(pm), pkg))
-        }
-        appList.sortBy { it.name }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val intent = Intent(Intent.ACTION_MAIN, null).apply { addCategory(Intent.CATEGORY_LAUNCHER) }
+            val resolveInfos = pm.queryIntentActivities(intent, 0)
+            
+            appList.clear()
+            for (info in resolveInfos) {
+                val pkg = info.activityInfo.packageName
+                if (pkg == packageName || hiddenPrefs.getBoolean(pkg, false)) continue
+                appList.add(AppInfo(info.loadLabel(pm).toString(), info.loadIcon(pm), pkg))
+            }
 
-        adapter = AppAdapter(appList, scrollMode == "horizontal") { app ->
-            packageManager.getLaunchIntentForPackage(app.packageName)?.let { startActivity(it) }
+            if (sortOrder == "name") {
+                appList.sortBy { it.name }
+            } else {
+                appList.sortBy { it.packageName }
+            }
+
+            withContext(Dispatchers.Main) {
+                adapter = AppAdapter(appList, scrollMode == "horizontal", isEasyMode) { app ->
+                    pm.getLaunchIntentForPackage(app.packageName)?.let { startActivity(it) }
+                }
+                
+                if (isEasyMode) {
+                    recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 2)
+                } else if (scrollMode == "horizontal") {
+                    recyclerView.layoutManager = LinearLayoutManager(this@MainActivity, LinearLayoutManager.HORIZONTAL, false)
+                } else {
+                    recyclerView.layoutManager = GridLayoutManager(this@MainActivity, 4)
+                }
+                
+                recyclerView.adapter = adapter
+                adapter.setIconSize(iconSize)
+            }
         }
-        
-        if (scrollMode == "horizontal") {
-            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        } else {
-            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
-        }
-        
-        recyclerView.adapter = adapter
-        adapter.setIconSize(prefs.getInt("icon_size", 48))
     }
 
     override fun onResume() {
         super.onResume()
-        if (getSharedPreferences("launcher_prefs", MODE_PRIVATE).getBoolean("setup_complete", false)) {
-            loadApps()
-            updateHeaderTime(findViewById(R.id.tvGreeting), findViewById(R.id.tvDateInfo))
-        }
+        loadApps()
     }
 }
