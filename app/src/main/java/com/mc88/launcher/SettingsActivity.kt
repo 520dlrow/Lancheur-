@@ -1,18 +1,19 @@
 package com.mc88.launcher
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
+import android.hardware.camera2.CameraManager
 import android.os.Bundle
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
-import android.widget.RadioButton
-import android.widget.RadioGroup
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.slider.Slider
 
 class SettingsActivity : AppCompatActivity() {
+
+    private var isFlashOn = false
+    private lateinit var cameraManager: CameraManager
+    private lateinit var cameraId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val prefs = getSharedPreferences("launcher_prefs", MODE_PRIVATE)
@@ -29,10 +30,7 @@ class SettingsActivity : AppCompatActivity() {
         val radioWarm = findViewById<RadioButton>(R.id.radioWarm)
         val radioGroupTheme = findViewById<RadioGroup>(R.id.radioGroupTheme)
 
-        val cbDynamicColors = findViewById<CheckBox>(R.id.cbDynamicColors)
         val cbEasyMode = findViewById<CheckBox>(R.id.cbEasyMode)
-        val cbShowDock = findViewById<CheckBox>(R.id.cbShowDock)
-
         val radioVertical = findViewById<RadioButton>(R.id.radioVertical)
         val radioHorizontal = findViewById<RadioButton>(R.id.radioHorizontal)
         val radioGroupScroll = findViewById<RadioGroup>(R.id.radioGroupScroll)
@@ -42,18 +40,37 @@ class SettingsActivity : AppCompatActivity() {
         val radioGroupSort = findViewById<RadioGroup>(R.id.radioGroupSort)
 
         val sliderIconSize = findViewById<Slider>(R.id.sliderIconSize)
+        val btnFlashlight = findViewById<Button>(R.id.btnFlashlight)
         val btnHiddenApps = findViewById<Button>(R.id.btnHiddenApps)
         val btnBack = findViewById<Button>(R.id.btnBack)
+
+        try {
+            cameraManager = getSystemService(Context.CAMERA_SERVICE) as CameraManager
+            cameraId = cameraManager.cameraIdList[0]
+        } catch (e: Exception) {
+            btnFlashlight.isEnabled = false
+        }
+
+        btnFlashlight.setOnClickListener {
+            try {
+                isFlashOn = !isFlashOn
+                cameraManager.setTorchMode(cameraId, isFlashOn)
+                if (isFlashOn) {
+                    btnFlashlight.text = "Turn Off Flashlight"
+                } else {
+                    btnFlashlight.text = "Turn On Flashlight"
+                }
+            } catch (e: Exception) {
+                Toast.makeText(this, "Flashlight not available", Toast.LENGTH_SHORT).show()
+            }
+        }
 
         val currentTheme = prefs.getString("theme", "light")
         radioLight.isChecked = currentTheme == "light"
         radioDark.isChecked = currentTheme == "dark"
         radioWarm.isChecked = currentTheme == "warm"
 
-        cbDynamicColors.isChecked = prefs.getBoolean("dynamic_colors", false)
         cbEasyMode.isChecked = prefs.getBoolean("easy_mode", false)
-        cbShowDock.isChecked = prefs.getBoolean("show_dock", true)
-
         radioVertical.isChecked = prefs.getString("scroll_mode", "vertical") == "vertical"
         radioHorizontal.isChecked = prefs.getString("scroll_mode", "vertical") == "horizontal"
 
@@ -72,16 +89,8 @@ class SettingsActivity : AppCompatActivity() {
             recreate()
         }
 
-        cbDynamicColors.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("dynamic_colors", isChecked).apply()
-        }
-
         cbEasyMode.setOnCheckedChangeListener { _, isChecked ->
             prefs.edit().putBoolean("easy_mode", isChecked).apply()
-        }
-
-        cbShowDock.setOnCheckedChangeListener { _, isChecked ->
-            prefs.edit().putBoolean("show_dock", isChecked).apply()
         }
 
         radioGroupScroll.setOnCheckedChangeListener { _, checkedId ->
