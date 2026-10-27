@@ -3,21 +3,27 @@
     <style name="Theme.MC88Launcher" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:textColorPrimary">#3A4756</item>
-        <item name="colorPrimary">#3A4756</item>
     </style>
 
     <style name="Theme.MC88Launcher.Dark" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:textColorPrimary">#F1F5F9</item>
-        <item name="colorPrimary">#F1F5F9</item>
     </style>
 
     <style name="Theme.MC88Launcher.Warm" parent="Theme.Material3.Dark.NoActionBar">
         <item name="android:windowShowWallpaper">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
         <item name="android:textColorPrimary">#FEF3C7</item>
-        <item name="colorPrimary">#FEF3C7</item>
     </style>
 </resources>
