@@ -1,5 +1,6 @@
 package com.mc88.launcher
 
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,12 +39,19 @@ class AppAdapter(
         holder.tvAppName.text = app.name
         holder.ivAppIcon.setImageDrawable(app.icon)
         
-        if (isHorizontal || isEasyMode) {
+        if (isHorizontal) {
             holder.root.orientation = LinearLayout.VERTICAL
+            holder.root.gravity = Gravity.CENTER
+            holder.tvAppName.setPadding(0, 12, 0, 0)
+            holder.root.minimumWidth = 100
+        } else if (isEasyMode) {
+            holder.root.orientation = LinearLayout.VERTICAL
+            holder.root.gravity = Gravity.CENTER
             holder.tvAppName.setPadding(0, 16, 0, 0)
             holder.root.minimumWidth = 120
         } else {
             holder.root.orientation = LinearLayout.HORIZONTAL
+            holder.root.gravity = Gravity.CENTER_VERTICAL
             holder.tvAppName.setPadding(20, 0, 0, 0)
             holder.root.minimumWidth = 0
         }
